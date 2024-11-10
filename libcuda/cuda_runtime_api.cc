@@ -944,7 +944,7 @@ cudaError_t cudaLaunchInternal(const char *hostFun,
          hostFun,
          (ctx->func_sim->g_ptx_sim_mode) ? "functional simulation"
                                          : "performance simulation",
-         stream ? stream->get_uid() : 0);
+         (((intptr_t)stream) > 2) ? stream->get_uid() : 0);
   kernel_info_t *grid = ctx->api->gpgpu_cuda_ptx_sim_init_grid(
       hostFun, config.get_args(), config.grid_dim(), config.block_dim(),
       context);
