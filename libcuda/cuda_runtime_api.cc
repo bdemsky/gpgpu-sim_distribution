@@ -998,7 +998,7 @@ cudaError_t cudaLaunchInternal(const char *hostFun,
   printf(
       "GPGPU-Sim PTX: pushing kernel \'%s\' to stream %u, gridDim= (%u,%u,%u) "
       "blockDim = (%u,%u,%u) \n",
-      kname.c_str(), stream ? stream->get_uid() : 0, gridDim.x, gridDim.y,
+      kname.c_str(), ((intptr_t)stream) > 2 ? stream->get_uid() : 0, gridDim.x, gridDim.y,
       gridDim.z, blockDim.x, blockDim.y, blockDim.z);
   stream_operation op(grid, ctx->func_sim->g_ptx_sim_mode, stream);
   ctx->the_gpgpusim->g_stream_manager->push(op);

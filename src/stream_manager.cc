@@ -433,7 +433,7 @@ void stream_manager::push(stream_operation op) {
 
   // block if stream 0 (or concurrency disabled) and pending concurrent
   // operations exist
-  bool block = !stream || m_cuda_launch_blocking;
+  bool block = ((intptr_t)stream) <= 2  || m_cuda_launch_blocking;
   while (block) {
     pthread_mutex_lock(&m_lock);
     block = !concurrent_streams_empty();
@@ -444,7 +444,7 @@ void stream_manager::push(stream_operation op) {
   if (!m_gpu->cycle_insn_cta_max_hit()) {
     // Accept the stream operation if the maximum cycle/instruction/cta counts
     // are not triggered
-    if (stream && !m_cuda_launch_blocking) {
+    if (((intptr_t)stream) > 2 && !m_cuda_launch_blocking) {
       stream->push(op);
     } else {
       op.set_stream(&m_stream_zero);
@@ -460,7 +460,7 @@ void stream_manager::push(stream_operation op) {
   }
   if (g_debug_execution >= 3) print_impl(stdout);
   pthread_mutex_unlock(&m_lock);
-  if (m_cuda_launch_blocking || stream == NULL) {
+  if (m_cuda_launch_blocking || ((intptr_t)stream) < 2) {
     unsigned int wait_amount = 100;
     unsigned int wait_cap = 100000;  // 100ms
     while (!empty()) {
